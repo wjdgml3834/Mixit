@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+  <style>
+    .info-section {
+      background-color: #E2E9ED;
+      color: #004747;
+      padding: 20px;
+      margin-top: 60px;
+      margin-bottom: 20px;
+      border-radius: 12px; 
+      max-height: 28vh;
+      min-height: 250px;
+      overflow-y: auto;
+      line-height: 1.0; 
+    }
+    .info-section > h2 {
+      margin-top: 0;
+    }
+    
+  </style>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="info-section h-100">
+          <h2>Patient</h2>
+          <p></p>
+          <p><strong>Firstname: </strong><span id="patient-firstname">{{ patient.firstname }}</span></p>
+          <p><strong>Lastname: </strong><span id="patient-lastname">{{ patient.lastname }}</span></p>
+          <p><strong>Birthdate: </strong><span id="patient-birthdate">{{ patient.birthdate }}</span></p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="info-section h-100">
+          <h2>Address</h2>
+          <p></p>
+          <p><strong>Streetname: </strong><span id="address-streetname">{{ address.straatnaam }}</span></p>
+          <p><strong>Housenumber: </strong><span id="address-housenumber">{{ address.huisnummer }}</span></p>
+          <p><strong>Postalcode: </strong><span id="address-postcode">{{ address.postcode }}</span></p>
+          <p><strong>City: </strong><span id="address-city">{{ address.stad }}</span></p>
+          <p><strong>Route:</strong> <a id="googleMapsLink" href="#" target="_blank">Open in Google Maps</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="info-section h-100">
+          <h2>Appointment Information</h2>
+          <p></p>
+          <p><strong>Date: </strong><span id="appointment-date">{{ appointment.datum }}</span></p>
+          <p><strong>Summary: </strong><span id="appointment-summary">{{ appointment.samenvatting }}</span></p>
+          <p><strong>Note: </strong><span id="appointment-note">{{ appointment.notitie }}</span></p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="info-section h-100">
+          <h2>Medicine</h2>
+          <p></p>
+          <p><strong>Prescription name: </strong><span id="prescription-name">{{ prescriptiondata.name }}</span></p>
+          <p><strong>Prescriber: </strong><span id="prescriber-prescriber">{{ prescriberdata.firstname }} {{ prescriberdata.lastname }}</span></p>
+          <p><strong>Medicine name: </strong><span id="medicine-name">{{ medicine.name }}</span></p>
+          <p><strong>Strength: </strong><span id="medicine-strength">{{ medicine.strength }}</span></p>
+          <p><strong>Amount: </strong><span id="medicine-amount">{{ medicine.amount }}</span></p>
+          <p><strong>Usage: </strong><span id="medicine-usage">{{ medicine.usage }}</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+{% endblock %}
+

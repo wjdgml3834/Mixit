@@ -1,0 +1,193 @@
+{% extends 'base.html' %} 
+{% block content %}
+
+<head>
+    <title>Mix-IT</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #events-background {
+            background-color: #e2e9ed;
+            padding: 20px;
+            margin-top: 10px;
+            width: 50%; /* Adjusted width */
+        }
+
+        h3 {
+            color: #004747;
+        }
+
+        .event-container {
+            width: 100%;
+        }
+
+        .event-card {
+            background-color: #004747;
+            border-radius: 50px;
+            padding: 20px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .event-card:hover {
+            transform: scale(1.05);
+        }
+
+        .event-details p {
+            margin: 5px 0;
+        }
+        .event-details-name {
+            color: #dbff00;
+            font-weight: bold;
+            font-size: larger;
+        }
+        .event-details-time {
+            color: #e1e9ed;
+            font-weight: bold;
+        }
+        .event-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+<h2 class="mt-4">
+    <img src="{{ url_for('static', filename='user.png') }}" alt="User Icon" style="width: 50px; height: 50px; margin-right: 10px" />
+    Welcome {{ user.get('name') }}!
+</h2>
+
+<div style="background-color: #e2e9ed; padding: 20px; margin-top: 10px; width: 50%">
+    <h3>Appointments today</h3>
+    {% for i in result %} {% set appointment_date = i["start"]["dateTime"][:10] %} {%
+    if appointment_date == today %} {% set appointments_today = appointments_today + [i] %} {% endif %} {% endfor %} {%
+    if appointments_today %}
+    <table class="table-hover table table-borderless table-sm">
+        <tr>
+            <th width="15%">Type afspraak</th>
+            <th width="25%">Patiënt</th>
+            <th width="25%">Begin tijd</th>
+            <th width="25%">Eind tijd</th>
+            <th width="25%">Locatie</th>
+            <th width="15%">Route</th>
+        </tr>
+        {% for i in appointments_today %}
+        <tr style="background-color: #4caf50; color: white">
+            <td>{{ i["subject"] }}</td>
+            <td>{{ i["attendees"][0]["emailAddress"]["name"] }}</td>
+            <td>{{ i["start"]["dateTime"]|datetimeformat('%Y-%m-%d') }}</td>
+            <td>{{ i["end"]["dateTime"]|datetimeformat('%Y-%m-%d') }}</td>
+            <td>{{ i["location"]["displayName"] }}</td>
+            {% if i["location"]["coordinates"] != null %}
+            <td>
+                <a
+                    href='https://www.google.com/maps/search/?api=1&query={{ i["location"]["coordinates"]["latitude"] }},{{ i["location"]["coordinates"]["longitude"] }}'
+                    >Open in Maps</a
+                >
+            </td>
+            {% else %}
+            <td>
+                <a href='https://www.google.com/maps/search/?api=1&query={{ i["location"]["displayName"] }}'
+                    >Locatie openen in Maps</a
+                >
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>You have no appointments today.</p>
+    {% endif %}
+</div>
+
+<div style="position: fixed; bottom: 20px; right: 0; margin: 10px">
+    <a
+        href="/graphcall"
+        style="
+            text-decoration: none;
+            background-color: #aad5df;
+            color: #004747;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        "
+    >
+        View all appointments
+        <div style="background-color: #dbff00; width: 24px; margin-left: 5px; border-radius: 4px">
+            <img
+                src="{{ url_for('static', filename='arrow.png') }}"
+                alt="Arrow Icon"
+                style="width: 16px; height: 16px; margin: 4px"
+            />
+        </div>
+    </a>
+</div>
+
+<div id="events-background">
+    <h3>Edited appointments:</h3>
+    <div id="events-container"></div>
+</div>
+
+{% endblock %} {% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        if (!!window.EventSource) {
+            var source = new EventSource('/events');
+
+            source.onmessage = function (event) {
+                let eventData = JSON.parse(event.data);
+                let html = '';
+
+                eventData.forEach((event) => {
+                    const attendeeName =
+                        event.attendees && event.attendees.length > 0
+                            ? event.attendees[0].emailAddress.name
+                            : 'No Attendees';
+
+                    const startDateTime = new Date(event.start.dateTime + 'Z');
+                    const endDateTime = new Date(event.end.dateTime + 'Z');
+
+                    const startDate = startDateTime.toLocaleDateString('nl-NL');
+                    const startTime = startDateTime.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+                    const endTime = endDateTime.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+
+                    let timeDisplay = startDate + ' ' + startTime;
+                    if (startDateTime.toDateString() === endDateTime.toDateString()) {
+                        timeDisplay += ' ~ ' + endTime;
+                    } else {
+                        timeDisplay += ' ~ ' + endDateTime.toLocaleDateString('nl-NL') + ' ' + endTime;
+                    }
+
+                    html += `
+                        <div class="event-card">
+                            <div class="event-details">
+                                <p class="event-details-name">${attendeeName}</p>
+                                <p class="event-details-time">${timeDisplay}</p>
+                            </div>
+                        </div>`;
+                });
+
+                document.getElementById('events-container').innerHTML = html;
+            };
+
+            source.onerror = function (error) {
+                console.error('EventSource failed:', error);
+                source.close();
+            };
+        } else {
+            console.log('Your browser does not support Server-Sent Events.');
+        }
+    });
+</script>
+
+{% endblock %}

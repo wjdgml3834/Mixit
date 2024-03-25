@@ -1,0 +1,87 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "location": {
+        "value": "westeurope"
+      },
+      "servicePlanName": {
+        "value": "AppServicePlan-mixit"
+      },
+      "websiteName": {
+        "value": "website-mixit"
+      },
+      "serviceBusName": {
+        "value": "ServiceBus-mixit"
+      },
+      "queueName": {
+        "value": "smsQueue"
+      },
+      "policyName": {
+        "value": "Policy-sms"
+      },
+      "policyRights": {
+        "value": ["Manage", "Send", "Listen"]
+      },
+      "storageAccountName": {
+        "value": "samixit"
+      },
+      "storageKind": {
+        "value": "StorageV2"
+      },
+      "storageSku": {
+        "value": "Standard_LRS"
+      },
+      "keyVaultName": {
+        "value": "KeyVault-mixit"
+      },
+      "keyVaultSecretName": {
+        "value": "KeyVaultSecret-sms"
+      },
+      "apiVersionSb": {
+        "value": "2022-10-01-preview"
+      },
+      "apiVersionStorage": {
+        "value": "2023-01-01"
+      },
+      "tenantId": {
+        "value": "0907bb1e-21fc-476f-8843-02d09ceb59a7"
+      },
+      "objectId": {
+        "value": [
+          "c2a6209c-6056-441d-a69c-ad5b60cb3f0a",
+          "5202c3c4-051d-40e9-8988-e9951ff08a44",
+          "85f9fb3d-70f0-4ca3-aad6-db8f07c1ae0b",
+          "8abb5485-f98f-4671-868a-bccf6d34b3bc"
+        ]
+      },
+      "keysPermissions": {
+        "value": ["all"]
+      },
+      "secretsPermissions": {
+        "value": ["all"]
+      },
+      "skuFamily": {
+        "value": "A"
+      },
+      "skuName": {
+        "value": "Standard"
+      },
+      "skuTier": {
+        "value": "Standard"
+      },
+      "functionAppName": {
+        "value": "funcApp-mixit"
+      },
+      "functionAppKind": {
+        "value": "functionapp"
+      },
+      "functionAppRuntimeValue": {
+        "value": "python"
+      },
+      "functionAppExtensionVersion": {
+        "value": "~4"
+      }
+    }
+  }
+  

@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+
+{% block head %}
+  <title>Mix-IT</title>
+{% endblock %}
+  <br /><br />
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-3" style="background-color: #E2E9ED; padding: 20px; border-radius: 12px; margin-top: 10px; max-height: 28vh; overflow-y: auto;">
+        <div class="container">
+          <form class="row">
+            <label for="date" class="col-12 col-form-label">Datum</label>
+            <div class="col-12">
+              <div class="input-group date" id="datepicker">
+                <input type="datetime-local" name="start-time-demo" id="start-time-demo" class="form-control" placeholder="mm-hh-dd-mm-yy"/>
+                </div>
+              </div>
+            </form>
+          </div>
+        <div align="right" style="padding: 20px;">
+          <button type="button" name="age" id="age" data-bs-toggle="modal" data-bs-target="#add_data_Modal" class="btn btn-primary">New appointment</button>
+        </div>
+      </div>
+
+{% block content %}
+<br /><br />
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-3" style="background-color: #E2E9ED; padding: 20px; border-radius: 12px; margin-top: 10px; max-height: 28vh; overflow-y: auto;">
+      <div class="container">
+        <form class="row">
+          <label for="date" class="col-12 col-form-label">Date</label>
+          <div class="col-12">
+            <div class="input-group date" id="datepicker">
+              <input type="datetime-local" name="start-time-demo" id="start-time-demo" class="form-control" placeholder="mm-hh-dd-mm-yy"/>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div align="right" style="padding: 20px;">
+        <button type="button" name="age" id="age" data-bs-toggle="modal" data-bs-target="#add_data_Modal" class="btn btn-primary" style="background-color: #004747; color: #DBFF00 ;">New appointment</button>
+      </div>
+    </div>
+
+    <div class="col-md-9" style="margin: 20px 0;">
+      <div style="background-color: #E2E9ED; padding: 20px; border-radius: 12px; margin-top: -10px; width: calc(100% - 40px);">
+        {% for i in result %}
+        <div style="background-color: #004747; color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between;" onclick="myFunction('{{i['id']}}')" >
+          <div style="flex-grow: 1; font-size: 20px; font-weight: bold; color: #DBFF00;">
+            <strong></strong> {% if i["attendees"] and i["attendees"]|length > 0 %}{{ i["attendees"][0]["emailAddress"]["name"] }}{% else %}Geen patiënt{% endif %}
+          </div>
+          <div style="flex-grow: 1; text-align: right;">
+            <strong></strong> {{ i["start"]["dateTime"]|format_start_date }} {{ i["start"]["dateTime"]|format_end_time }} - {{ i["end"]["dateTime"]|format_end_time }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+           
+  </div>
+  <div id="add_data_Modal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Create an appointment</h4>
+          <button type="button" class="btn" data-bs-dismiss="modal">×</button>
+        </div>
+        <div class="modal-body">
+          <form method="post" id="insert_form">
+            <label>Type Apointment</label>
+            <div style="position: relative;">
+              <select name="typeapoint" id="typeapoint" class="form-control">
+                  <option value="" disabled selected>choose type</option>
+                  <option value="Persoonlijke verzorging">Personal care</option>
+                  <option value="Medische zorg">Medical care</option>
+                  <option value="Huishoudelijke taken">Household chores</option>
+                  <option value="Gezelschap en sociaal contact">Companionship and social contact</option>
+                  <option value="Mobiliteitsassistentie">Mobility assistance</option>
+                  <option value="Ondersteuning bij administratieve taken">Support with administrative tasks</option>
+              </select>
+              <span class="select-icon" style="position: absolute; right: 10px; top: calc(50% - 5px); pointer-events: none;">
+                  ▼
+              </span>
+            </div>
+            <br />            
+            <label>Client Name</label>
+            <div class="row">
+              <div class="col">
+                <input type="text" name="firstname" id="firstname" class="form-control" placeholder="First name"/>
+              </div>
+              <div class="col">
+                <input type="text" name="lastname" id="lastname" class="form-control" placeholder="Last name"/>
+              </div>
+            </div>
+            <br />
+            <label>Email-adress</label>
+            <input type="text" name="emailaddress" id="emailaddress" class="form-control" placeholder="example@example.com"/></input>
+            <br />
+            <label>Start Time </label>
+            <input type="datetime-local" name="start-time" id="start-time" class="form-control" placeholder="mm-hh-dd-mm-yy"/>
+            <br />
+            <label>Duration</label>
+            <div style="position: relative;">
+              <select name="duration" id="duration" class="form-control">
+                <option value="" disabled selected>choose time</option>
+                <option value="15">15min</option>
+                <option value="30">30min</option>
+                <option value="45">45min</option>
+                <option value="1">1hr</option>
+                <option value="2">2hr</option>
+              </select>
+              <span class="select-icon" style="position: absolute; right: 10px; top: calc(50% - 5px); pointer-events: none;">
+                ▼
+              </span>
+            </div>
+            <br />
+            <label>Client's address</label>
+            <div class="col">
+              <input type="text" name="streetname" id="streetname" class="form-control" placeholder="Street name"/>
+            </div>
+            <br />
+            <div class="row">
+              <div class="col">
+                <input type="text" name="postalcode" id="postalcode" class="form-control" placeholder="Postal code"/>
+              </div>
+              <div class="col">
+                <input type="text" name="housenr" id="housenr" class="form-control" placeholder="House number"/>
+              </div>
+            </div>
+            <br>
+            <div class="row">
+              <div class="row">
+                <div class="col">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="AddDoctor" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    <label class="form-check-label" for="AddDoctor">Add doctor</label>
+                  </div>
+                </div>
+                <script>
+                  document.addEventListener('DOMContentLoaded', function () {
+                      var addDoctorCheckbox = document.getElementById('AddDoctor');
+                      var collapseDiv = document.getElementById('collapseExample');
+              
+                      addDoctorCheckbox.addEventListener('change', function () {
+                          if (this.checked) {
+                              collapseDiv.style.display = 'block';
+                          } else {
+                              collapseDiv.style.display = 'none';
+                          }
+                      });
+                  });
+                </script>
+                <div class="col">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="AddMessage">
+                    <label class="form-check-label" for="AddMessage">Message</label>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var addMessageCheckbox = document.getElementById('AddMessage');
+                        var collapseMessageDiv = document.getElementById('collapsemassage');
+            
+                        addMessageCheckbox.addEventListener('change', function () {
+                            if (this.checked) {
+                                collapseMessageDiv.style.display = 'block';
+                            } else {
+                                collapseMessageDiv.style.display = 'none';
+                            }
+                        });
+                    });
+                </script>
+                </div>
+                <div class="col">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="bedprod">
+                    <label class="form-check-label" for="bedprod">Bed-prod</label>
+                  </div>              
+                </div>
+              </div>              
+            </div>
+            <div class="collapse" id="collapseExample">
+              <label for="Doctorid">Doctor</label>
+              <div style="position: relative;">
+                <select name="Doctorid" id="Doctorid" class="form-control">
+                  <option value="" disabled selected>choose doctor</option>
+                  <option value="1">Dr. Smith</option>
+                  <option value="3">Dr. Nguyen</option>
+                  <option value="4">Dr. García</option>
+                  <option value="5">Dr. Müller</option>
+                  <option value="6">Dr. Kim</option>
+                </select>
+                <span class="select-icon" style="position: absolute; right: 10px; top: calc(50% - 5px); pointer-events: none;">
+                  ▼
+                </span>
+              </div>
+            </div>
+            <div class="collapse" id="collapsemassage">
+              <div class="mb-3">
+                  <label for="exampleFormControlTextarea1" class="form-label">Special massage</label>
+                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer"> 
+              <input type="submit" name="insert" id="insert" value="Insert" class="btn btn-primary insert-btn" style="background-color: #004747; color: #DBFF00;"/>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+  </div>
+  {% endblock %}
+  {% block js %}
+  
+  <script>
+      function myFunction(id){
+        console.log("test")
+        console.log(id)
+        window.location.href = "/apointmentdetails/" + id ;
+      }
+
+    $(document).ready(function () {
+
+        $('#insert_form').on("submit", function (event) {
+        event.preventDefault();
+        
+          //check the checkboxes on state 
+          if ($("#bedprod").is(":checked")) {  
+            var bedprodcheck = true  
+          } 
+          else {
+            var bedprodcheck = false  
+          }
+          //special message
+          if ($("#AddMessage").is(":checked")) {  
+            var AddMessagecheck = true
+            var specialMessage =  $('#exampleFormControlTextarea1').val()
+            console.log(specialMessage)
+          } 
+          else {
+            var AddMessagecheck = false 
+            var specialMessage = false
+          }
+
+          //add doctor
+          if ($("#AddDoctor").is(":checked")) {  
+            var AddDoctorcheck = true  
+            var Doctorid =  $('#Doctorid').val()
+          } 
+          else {
+            var AddDoctorcheck = false
+            var Doctorid =  false
+          }
+
+        if ($('#firstname').val() == "") {
+          alert("Name is required");
+        }
+        else if ($('#lastname').val() == '') {
+          alert("Address is required");
+        }
+        else if ($('#emailaddress').val() == '') {
+          alert("Designation is required");
+        }
+        else {
+          $.ajax({
+            url: "/Add_Client",
+            method: "POST",
+            //data: $('#insert_form').serialize(),
+            data:{
+              "firstname":  $('#firstname').val(),
+              "lastname":  $('#lastname').val(),
+              "emailaddress":  $('#emailaddress').val(),
+              "start-time":  $('#start-time').val(),
+              "duration":  $('#duration').val(),
+              "housenr":  $('#housenr').val(),
+              "postalcode":  $('#postalcode').val(),
+              "streetname": $('#streetname').val(),
+              "typeapoint":  $('#typeapoint').val(),
+              "streetname":  $('#streetname').val(),
+              "bedprod":  bedprodcheck,
+              "AddMessagecheck":  AddMessagecheck,
+              "specialMessage":  specialMessage,
+              "AddDoctorcheck":  AddDoctorcheck,
+              "Doctorid":  Doctorid
+
+           },
+            beforeSend: function () {
+              $('#insert').val("Inserting");
+            },
+            success: function (data) {
+              $('#add_data_Modal').modal('hide');
+              if (data == 'success') {
+                window.location.href = "/";
+              }
+            }
+          });
+        }
+      });
+    });  
+  </script>
+{% endblock %}

@@ -1,0 +1,103 @@
+workflow:
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "web"
+          when: always
+
+include:
+    - template: Terraform/Base.latest.gitlab-ci.yml
+
+stages:
+    - test
+    - zipstage 
+    - TeraAndAzCli
+
+test:
+    stage: test
+    tags:
+        - hva
+    before_script:
+      - apk add --update python3 py3-pip python3-dev mariadb-dev build-base
+
+      - python -m venv venv
+      - source venv/bin/activate
+
+      - pip install --upgrade pip
+      - pip install pytest flask_testing
+
+      - cd flaskApp.Folder/Flask.App
+      - pip install -r requirements.txt
+    script:
+        - ls
+        - python -m pytest --junitxml=pytest.xml tests/
+    artifacts:
+        when: always
+        paths:
+            - flaskApp.Folder/Flask.App/pytest.xml
+        reports:
+            junit: flaskApp.Folder/Flask.App/pytest.xml
+
+zipstage:
+    image: joshkeegan/zip:latest
+    stage: zipstage
+    tags:
+        - hva
+    script:
+        # ZIP the Flask.App
+        - cd flaskApp.Folder/Flask.App/
+        - zip -r Flask-App.zip ./*
+        - ls
+        - pwd
+        # ZIP the Mixit-apotheek.Api
+        - cd ../Mixit-apotheek.Api/
+        - zip -r Mixit-apotheek-Api.zip ./*
+        - ls
+        - pwd
+        # ZIP the Mixit-patient.Api
+        - cd ../Mixit-patient.Api/
+        - zip -r Mixit-patient-Api.zip ./*
+        - ls
+        - pwd
+    artifacts:
+        paths:
+            - flaskApp.Folder/Flask.App/Flask-App.zip
+            - flaskApp.Folder/Mixit-apotheek.Api/Mixit-apotheek-Api.zip
+            - flaskApp.Folder/Mixit-patient.Api/Mixit-patient-Api.zip
+
+
+TeraAndAzCli:
+    stage: TeraAndAzCli
+    # use Azure CLI image as a starting point
+    image: zenika/terraform-azure-cli
+    tags:
+        - hva
+    id_tokens:
+        ID_TOKEN_1:
+            aud: https://gitlab.fdmci.hva.nl
+    variables:
+        AZURE_CLIENT_ID: $AZURE_CLIENT_ID
+        AZURE_TENANT_ID: $AZURE_TENANT_ID
+        TF_STATE_NAME: default
+
+    script:
+        - az --version # CLI is included in image
+        - terraform version # terraform is now installed!
+        #... now you can use azure cli and terraform together.
+        - az login --tenant $AZURE_TENANT_ID
+          --service-principal
+          --username $AZURE_CLIENT_ID
+          --federated-token $ID_TOKEN_1
+        - az account show
+        - az account set --subscription $AZURE_SUBSCRIPTION_ID
+        - az group list -otable
+        - terraform -chdir=./tf-files init
+        - terraform -chdir=./tf-files validate
+        - terraform -chdir=./tf-files plan
+        - terraform -chdir=./tf-files apply -auto-approve
+        - ls
+        - cd flaskApp.Folder/
+        - ls
+        - pwd
+        - az webapp deployment source config-zip --name "website-740144f4" --resource-group "mixit-740144f4" --src Flask.App/Flask-App.zip
+        - az webapp deployment source config-zip --name "ApotheekApi-840144f4" --resource-group "mixit-740144f4" --src Mixit-apotheek.Api/Mixit-apotheek-Api.zip
+        - az webapp deployment source config-zip --name "PatientApi-940144f4" --resource-group "mixit-740144f4" --src Mixit-patient.Api/Mixit-patient-Api.zip
+

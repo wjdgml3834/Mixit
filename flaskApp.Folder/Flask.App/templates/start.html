@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+    </head>
+    <style>
+        
+        *{
+            list-style: none;
+            text-decoration: none;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body{
+            background: #f5f6fa;
+        }
+
+        .wrapper .sidebar{
+            background: rgb(5, 68, 104);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 225px;
+            height: 100%;
+            padding: 0px 0;
+            transition: all 0.5s ease;
+        }
+
+        .wrapper .sidebar .sidebar-head{
+            margin-bottom: 30px;
+            text-align: left;
+            background-color: darkblue;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        .wrapper .sidebar ul li a{
+            display: block;
+            padding: 13px 30px;
+            border-bottom: 1px solid #10558d;
+            color: rgb(241, 237, 237);
+            font-size: 16px;
+            position: relative;
+        }
+
+        .wrapper .sidebar ul li a .icon{
+            color: #dee4ec;
+            width: 30px;
+            display: inline-block;
+        }       
+
+
+    </style>
+    <body>
+        <div class="wrapper">
+            <!--Top menu -->
+            <div class="sidebar">
+               <!--Top text-->
+                <div class="sidebar-head">
+                    <h3>Mixit!</h3>
+                </div>
+                <!--menu item-->
+                <ul>
+                    <li>
+                        <a href="#" class="active">
+                            <span class="icon"><i class="fas fa-home"></i></span>
+                            <span class="item">Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="icon"><object type="image/svg+xml" data="https://s3-eu-west-1.amazonaws.com/cdn-testing.web.bas.ac.uk/scratch/bas-style-kit/ms-pictogram/ms-pictogram.svg" class="x-icon"></object> </span>
+                            <span class="item">Sign in</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+    
+        </div>
+    </body>
+</html>
